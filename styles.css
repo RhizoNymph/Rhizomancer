@@ -1,0 +1,30 @@
+.llm-search-input, .llm-prompt-input {
+    width: 100%;
+    margin-bottom: 10px;
+    min-height: 60px;
+    resize: vertical;
+}
+
+.search-container, .prompt-container {
+    margin-bottom: 10px;
+}
+
+.search-container label, .prompt-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.radio-group {
+    margin: 10px 0;
+}
+
+.radio-label {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.radio-label input[type="radio"] {
+    margin-right: 5px;
+}
