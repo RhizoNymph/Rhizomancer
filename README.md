@@ -7,7 +7,7 @@ If you use nix, you can use 'nix develop' instead of 'npm install'. After runnin
 
 The AI functionality is handled by a flask server at: <https://github.com/RhizoNymph/DwarfInTheFlask>.
 
-Clone it onto a PC with Cuda installed (if you want to use anything outside of the base /chat route you'll need it, if not then you can get away without it).
+Clone it onto a PC with Cuda installed (I'm assuming you have a cuda capable gpu, if you want to use anything outside of the base /chat route you'll need it, if not then you can get away without it. Will do my best to relax this requirement in the future).
 
 Run 'uv run flask_server.py' and then in your Obsidian settings panel at the bottom on the left you should see the settings for this plugin. Set the server address to where you're running the flask server. Default is https://127.0.0.1:5000. If you can run flash attention you should also run 'uv pip install flash-attn --no-build-isolation'. This one might take a while, flash attn take a long time to build. It's supposed to be fast with ninja but idk. You can use the requirements.txt if you don't want to use uv, but you really should just use uv.
 
