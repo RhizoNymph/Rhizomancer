@@ -24,7 +24,18 @@ export class EpisodeListModal extends Modal {
     async onOpen() {
         const { contentEl } = this;
         contentEl.empty();
-        contentEl.createEl('h1', { text: 'Select an Episode' });
+
+        // Create header container for title and download all button
+        const headerContainer = contentEl.createEl('div', { cls: 'header-container' });
+        headerContainer.createEl('h1', { text: 'Select an Episode' });
+
+        // Add Download All button
+        const downloadAllButton = headerContainer.createEl('button', {
+            text: 'Download All on Page',
+            cls: 'download-all-button'
+        });
+
+        downloadAllButton.addEventListener('click', () => this.downloadAllOnPage());
 
         await this.fetchEpisodes();
 
@@ -136,5 +147,26 @@ export class EpisodeListModal extends Modal {
             console.error('Error creating note:', err);
             new Notice('Error creating note.');
         });
+    }
+
+    async downloadAllOnPage() {
+        const notice = new Notice('Downloading all episodes on this page...', 0);
+
+        try {
+            // Create an array of promises for all downloads
+            const downloadPromises = this.episodes.map(episode =>
+                this.fetchAndCreateNote(episode.number)
+            );
+
+            // Wait for all downloads to complete
+            await Promise.all(downloadPromises);
+
+            notice.hide();
+            new Notice('Successfully downloaded all episodes on this page!');
+        } catch (error) {
+            notice.hide();
+            new Notice('Error downloading some episodes. Check console for details.');
+            console.error('Error downloading episodes:', error);
+        }
     }
 }

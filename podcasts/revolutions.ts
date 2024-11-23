@@ -21,22 +21,32 @@ export class EpisodeListModal extends Modal {
     }
 
     async onOpen() {
-        const { contentEl } = this;
-        contentEl.empty();
-        contentEl.createEl('h1', { text: 'Revolutions Podcast Episodes' });
+         const { contentEl } = this;
+         contentEl.empty();
 
-        await this.fetchEpisodes();
+         // Create header container
+         const headerContainer = contentEl.createEl('div', { cls: 'header-container' });
+         headerContainer.createEl('h1', { text: 'Revolutions Podcast Episodes' });
 
-        this.episodes.forEach(episode => {
-            const episodeContainer = contentEl.createEl('div', { cls: 'episode-container' });
-            const processButton = episodeContainer.createEl('button', { text: 'Process Episode' });
-            episodeContainer.createEl('span', { text: episode.title });  // Changed this line
+         // Add Process All button
+         const processAllButton = headerContainer.createEl('button', {
+             text: 'Process All Episodes',
+             cls: 'process-all-button'
+         });
+         processAllButton.addEventListener('click', () => this.processAllEpisodes());
 
-            processButton.addEventListener('click', async () => {
-                await this.processEpisode(episode);
-            });
-        });
-    }
+         await this.fetchEpisodes();
+
+         this.episodes.forEach(episode => {
+             const episodeContainer = contentEl.createEl('div', { cls: 'episode-container' });
+             const processButton = episodeContainer.createEl('button', { text: 'Process Episode' });
+             episodeContainer.createEl('span', { text: episode.title });
+
+             processButton.addEventListener('click', async () => {
+                 await this.processEpisode(episode);
+             });
+         });
+     }
 
     async fetchEpisodes() {
         const url = 'https://revolutionspodcast.libsyn.com/rss/';
@@ -52,6 +62,22 @@ export class EpisodeListModal extends Modal {
             }
             new Notice('Failed to fetch episodes.');
         }
+    }
+
+    async processAllEpisodes() {
+        new Notice('Starting to process all episodes...');
+
+        for (const episode of this.episodes) {
+            try {
+                await this.processEpisode(episode);
+            } catch (error) {
+                console.error(`Failed to process episode ${episode.title}:`, error);
+                new Notice(`Failed to process episode ${episode.title}`);
+                // Continue with next episode even if one fails
+            }
+        }
+
+        new Notice('Finished processing all episodes');
     }
 
     parseXml(xml: string): Promise<any> {

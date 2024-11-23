@@ -1,6 +1,7 @@
 import { App, Modal } from 'obsidian';
 import { EpisodeListModal as ZKEpisodeListModal } from './zk';
 import { EpisodeListModal as RevolutionsEpisodeListModal } from './revolutions';
+import { EpisodeListModal as LatentSpaceEpisodeListModal } from './latentspace';
 import Rhizomancer from '../main';
 
 export class PodcastSelectionModal extends Modal {
@@ -26,6 +27,10 @@ export class PodcastSelectionModal extends Modal {
             new RevolutionsEpisodeListModal(this.app, this.plugin).open();
             this.close();
         };
-
+        const latentButton = contentEl.createEl('button', { text: 'Latent Space' });
+        latentButton.onclick = () => {
+            new LatentSpaceEpisodeListModal(this.app, this.plugin).open();
+            this.close();
+        };
     }
 }
