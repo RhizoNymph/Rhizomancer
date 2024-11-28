@@ -6,10 +6,12 @@ import { BookSelectionModal } from '../books/modal';
 
 export class MainSelectionModal extends Modal {
     plugin: Rhizomancer;
+    serverAddress: String;
 
-    constructor(app: App, plugin: Rhizomancer) {
+    constructor(app: App, plugin: Rhizomancer, serverAddress: String) {
         super(app);
         this.plugin = plugin;
+        this.serverAddress = serverAddress;
     }
 
     onOpen() {
@@ -19,7 +21,7 @@ export class MainSelectionModal extends Modal {
 
         const podcastsButton = contentEl.createEl('button', { text: 'Podcasts' });
         podcastsButton.onclick = () => {
-            new PodcastSelectionModal(this.app, this.plugin).open();
+            new PodcastSelectionModal(this.app, this.plugin, this.serverAddress).open();
             this.close();
         };
 

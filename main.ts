@@ -5,6 +5,7 @@ import { IndexNameModal } from './views/IndexNameModal';
 import { arrayBufferToBase64 } from './util/misc'
 import { extractPDFToMarkdown, extractAllPDFsToMarkdown } from './util/pdf';
 import { transcribeCurrentFileAndSave } from './util/whisper';
+import { addMissingEpisodes } from './util/overview';
 
 interface RhizomancerSettings {
     serverAddress: string;
@@ -48,12 +49,13 @@ export default class Rhizomancer extends Plugin {
         await this.loadSettings();
         this.addSettingTab(new RhizomancerSettingTab(this.app, this));
 
+        console.log(this.settings.serverAddress)
         this.addCommand({
             id: 'open-Rhizomancer-modal',
             name: 'Open Rhizomancer Modal',
             hotkeys: [{ modifiers: ["Ctrl"], key: "R" }],
             callback: () => {
-                new MainSelectionModal(this.app, this).open();
+                new MainSelectionModal(this.app, this, this.settings.serverAddress).open();
             }
         });
         this.addCommand({
@@ -72,7 +74,7 @@ export default class Rhizomancer extends Plugin {
             callback: () => transcribeCurrentFileAndSave(this.app, this)
         });
         this.addRibbonIcon('dice', 'Rhizomancer', () => {
-            new MainSelectionModal(this.app, this).open();
+            new MainSelectionModal(this.app, this, this.settings.serverAddress).open();
         });
 
         this.registerView(
@@ -126,7 +128,22 @@ export default class Rhizomancer extends Plugin {
               }
               return false;
           }
-      });
+        });
+
+        this.addCommand({
+            id: 'add-missing-episodes',
+            name: 'Add Missing Episodes to Overview',
+            checkCallback: (checking: boolean) => {
+                const activeFile = this.app.workspace.getActiveFile();
+                if (activeFile && activeFile.extension === 'md') {
+                    if (!checking) {
+                        addMissingEpisodes(this.app);
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     async activateLLMView() {

@@ -82,7 +82,7 @@ export class EpisodeListModal extends Modal {
         }
 
         return channel.item.map((item: any) => ({
-            title: item.title ? item.title[0] : 'Unknown Title',
+            title: item.title ? item.title[0].replace(/\s#\d+/, '') : 'Unknown Title',
             mp3Url: item.enclosure ? item.enclosure[0].$.url : '',
             pubDate: item.pubDate ? item.pubDate[0] : '',
             link: item.link ? item.link[0] : '',

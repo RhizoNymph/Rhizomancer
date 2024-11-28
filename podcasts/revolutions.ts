@@ -14,10 +14,12 @@ interface Episode {
 export class EpisodeListModal extends Modal {
     plugin: Rhizomancer;
     episodes: Episode[] = [];
+    serverAddress: String;
 
-    constructor(app: App, plugin: Rhizomancer) {
+    constructor(app: App, plugin: Rhizomancer, serverAddress: String) {
         super(app);
         this.plugin = plugin;
+        this.serverAddress = serverAddress;
     }
 
     async onOpen() {
@@ -140,34 +142,45 @@ export class EpisodeListModal extends Modal {
         await this.ensureDirectoryExists(transcriptBasePath);
         console.log('Directories ensured');
 
-        // Download MP3
+        // Define file paths
         const mp3Path = `${mp3BasePath}/${sanitizedTitle}.mp3`;
-        console.log(`Downloading MP3 to: ${mp3Path}`);
-        await this.downloadFile(episode.mp3Url, mp3Path);
-        console.log('MP3 downloaded successfully');
-
-        // Transcribe
         const transcriptPath = `${transcriptBasePath}/${sanitizedTitle}.md`;
-        console.log(`Starting transcription. Output path: ${transcriptPath}`);
-        try {
-            const transcriptionResult = await transcribeAudio(this.app, mp3Path, {
-                modelSize: 'large',
-                chunkLength: 60,
-                temperature: 0.2
-            });
-            console.log('Transcription completed');
 
-            // Create markdown file with transcription
-            if (transcriptionResult) {
-                const markdownContent = `# ${episode.title}\n\n${transcriptionResult}`;
-                await this.app.vault.create(transcriptPath, markdownContent);
-                console.log(`Markdown file created at: ${transcriptPath}`);
-            } else {
-                console.error('Transcription result is empty or undefined');
+        // Check for existing files
+        const mp3Exists = await this.app.vault.adapter.exists(mp3Path);
+        const transcriptExists = await this.app.vault.adapter.exists(transcriptPath);
+
+        // Download MP3 only if it doesn't exist
+        if (!mp3Exists) {
+            console.log(`Downloading MP3 to: ${mp3Path}`);
+            await this.downloadFile(episode.mp3Url, mp3Path);
+            console.log('MP3 downloaded successfully');
+        } else {
+            console.log(`MP3 already exists at: ${mp3Path}`);
+        }
+
+        // Transcribe only if transcript doesn't exist
+        if (!transcriptExists) {
+            console.log(`Starting transcription. Output path: ${transcriptPath}`);
+            try {
+                console.log(this.serverAddress);
+                const transcriptionResult = await transcribeAudio(this.app, mp3Path, this.plugin, this.serverAddress);
+                console.log('Transcription completed');
+
+                // Create markdown file with transcription
+                if (transcriptionResult) {
+                    const markdownContent = `# ${episode.title}\n\n${transcriptionResult}`;
+                    await this.app.vault.create(transcriptPath, markdownContent);
+                    console.log(`Markdown file created at: ${transcriptPath}`);
+                } else {
+                    console.error('Transcription result is empty or undefined');
+                }
+            } catch (error) {
+                console.error('Error during transcription:', error);
+                new Notice(`Failed to transcribe episode: ${error.message}`);
             }
-        } catch (error) {
-            console.error('Error during transcription:', error);
-            new Notice(`Failed to transcribe episode: ${error.message}`);
+        } else {
+            console.log(`Transcript already exists at: ${transcriptPath}`);
         }
 
         new Notice(`Finished processing episode: ${episode.title}`);
