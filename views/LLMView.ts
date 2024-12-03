@@ -381,7 +381,7 @@ export class LLMView extends ItemView {
                 });
             });
 
-            const options = Array.from(this.indexSelect.options);
+            const options = [...new Set(Array.from(this.indexSelect.options))];
             const hasValue = options.some(option => option.value === currentValue);
             if (hasValue) {
                 this.indexSelect.value = currentValue;
