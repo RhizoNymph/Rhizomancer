@@ -2,6 +2,8 @@
 
 This is a plugin for whatever I want to do in obsidian because splitting functionalities seems like a fool's errand.
 
+Setup Video: <https://www.youtube.com/watch?v=gpvQ_rkkFOA>
+
 To install this, clone it to your Obsidian vaults .obsidian/plugins directory and run 'npm install' then 'npm run dev'.
 If you use nix, you can use 'nix develop' instead of 'npm install'. After running 'npm run dev' you should see 'build finished' in your console.
 
