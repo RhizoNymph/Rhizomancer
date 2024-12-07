@@ -3,6 +3,7 @@ import { App, Plugin, Modal, ItemView, TFile, TFolder, TAbstractFile, MarkdownVi
 import { PodcastSelectionModal } from '../podcasts/modal';
 import { PaperSelectionModal } from '../papers/modal';
 import { BookSelectionModal } from '../books/modal';
+import { VideoSelectionModal } from '../videos/modal';
 
 export class MainSelectionModal extends Modal {
     plugin: Rhizomancer;
@@ -34,6 +35,12 @@ export class MainSelectionModal extends Modal {
         const booksButton = contentEl.createEl('button', { text: 'Books' });
         booksButton.onclick = () => {
             new BookSelectionModal(this.app, this.plugin).open();
+            this.close();
+        };
+
+        const videosButton = contentEl.createEl('button', { text: 'Videos' });
+        videosButton.onclick = () => {
+            new VideoSelectionModal(this.app, this.plugin).open();
             this.close();
         };
     }
